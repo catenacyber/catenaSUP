@@ -2,14 +2,16 @@
 // Author Philippe Antoine <p.antoine@catenacyber.fr>
 // Server for catenaSUP
 
-package serverSUP
+package main
 
 import (
 	"log"
 	"net"
 
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	pb "msg"
+
+	pb "catena/csup/msg"
 )
 
 const (
@@ -50,7 +52,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 	pb.RegisterCatenaUserPassServer(s, &serverSUP{})
-	if err := s.Serve(lis); err != nil {
+	if err = s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }
