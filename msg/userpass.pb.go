@@ -2,7 +2,7 @@
 // source: userpass.proto
 
 /*
-Package catenasup is a generated protocol buffer package.
+Package catenaSUP is a generated protocol buffer package.
 
 It is generated from these files:
 	userpass.proto
@@ -12,11 +12,16 @@ It has these top-level messages:
 	User
 	Status
 */
-package catenasup
+package catenaSUP
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
+
+import (
+	context "golang.org/x/net/context"
+	grpc "google.golang.org/grpc"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -91,7 +96,7 @@ func (m *User) GetUser() string {
 }
 
 type Status struct {
-	Result Status_StatusType `protobuf:"varint,1,opt,name=result,enum=catenasup.Status_StatusType" json:"result,omitempty"`
+	Result Status_StatusType `protobuf:"varint,1,opt,name=result,enum=catenaSUP.Status_StatusType" json:"result,omitempty"`
 }
 
 func (m *Status) Reset()                    { *m = Status{} }
@@ -107,10 +112,181 @@ func (m *Status) GetResult() Status_StatusType {
 }
 
 func init() {
-	proto.RegisterType((*UserPass)(nil), "catenasup.UserPass")
-	proto.RegisterType((*User)(nil), "catenasup.User")
-	proto.RegisterType((*Status)(nil), "catenasup.Status")
-	proto.RegisterEnum("catenasup.Status_StatusType", Status_StatusType_name, Status_StatusType_value)
+	proto.RegisterType((*UserPass)(nil), "catenaSUP.UserPass")
+	proto.RegisterType((*User)(nil), "catenaSUP.User")
+	proto.RegisterType((*Status)(nil), "catenaSUP.Status")
+	proto.RegisterEnum("catenaSUP.Status_StatusType", Status_StatusType_name, Status_StatusType_value)
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// Client API for CatenaUserPass service
+
+type CatenaUserPassClient interface {
+	AddUser(ctx context.Context, in *UserPass, opts ...grpc.CallOption) (*Status, error)
+	ChangePass(ctx context.Context, in *UserPass, opts ...grpc.CallOption) (*Status, error)
+	CheckUserPass(ctx context.Context, in *UserPass, opts ...grpc.CallOption) (*Status, error)
+	DeleteUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*Status, error)
+}
+
+type catenaUserPassClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewCatenaUserPassClient(cc *grpc.ClientConn) CatenaUserPassClient {
+	return &catenaUserPassClient{cc}
+}
+
+func (c *catenaUserPassClient) AddUser(ctx context.Context, in *UserPass, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := grpc.Invoke(ctx, "/catenaSUP.CatenaUserPass/AddUser", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *catenaUserPassClient) ChangePass(ctx context.Context, in *UserPass, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := grpc.Invoke(ctx, "/catenaSUP.CatenaUserPass/ChangePass", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *catenaUserPassClient) CheckUserPass(ctx context.Context, in *UserPass, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := grpc.Invoke(ctx, "/catenaSUP.CatenaUserPass/CheckUserPass", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *catenaUserPassClient) DeleteUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*Status, error) {
+	out := new(Status)
+	err := grpc.Invoke(ctx, "/catenaSUP.CatenaUserPass/DeleteUser", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for CatenaUserPass service
+
+type CatenaUserPassServer interface {
+	AddUser(context.Context, *UserPass) (*Status, error)
+	ChangePass(context.Context, *UserPass) (*Status, error)
+	CheckUserPass(context.Context, *UserPass) (*Status, error)
+	DeleteUser(context.Context, *User) (*Status, error)
+}
+
+func RegisterCatenaUserPassServer(s *grpc.Server, srv CatenaUserPassServer) {
+	s.RegisterService(&_CatenaUserPass_serviceDesc, srv)
+}
+
+func _CatenaUserPass_AddUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserPass)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatenaUserPassServer).AddUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/catenaSUP.CatenaUserPass/AddUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatenaUserPassServer).AddUser(ctx, req.(*UserPass))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CatenaUserPass_ChangePass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserPass)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatenaUserPassServer).ChangePass(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/catenaSUP.CatenaUserPass/ChangePass",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatenaUserPassServer).ChangePass(ctx, req.(*UserPass))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CatenaUserPass_CheckUserPass_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserPass)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatenaUserPassServer).CheckUserPass(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/catenaSUP.CatenaUserPass/CheckUserPass",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatenaUserPassServer).CheckUserPass(ctx, req.(*UserPass))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CatenaUserPass_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(User)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatenaUserPassServer).DeleteUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/catenaSUP.CatenaUserPass/DeleteUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatenaUserPassServer).DeleteUser(ctx, req.(*User))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _CatenaUserPass_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "catenaSUP.CatenaUserPass",
+	HandlerType: (*CatenaUserPassServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AddUser",
+			Handler:    _CatenaUserPass_AddUser_Handler,
+		},
+		{
+			MethodName: "ChangePass",
+			Handler:    _CatenaUserPass_ChangePass_Handler,
+		},
+		{
+			MethodName: "CheckUserPass",
+			Handler:    _CatenaUserPass_CheckUserPass_Handler,
+		},
+		{
+			MethodName: "DeleteUser",
+			Handler:    _CatenaUserPass_DeleteUser_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "userpass.proto",
 }
 
 func init() { proto.RegisterFile("userpass.proto", fileDescriptor0) }
@@ -119,7 +295,7 @@ var fileDescriptor0 = []byte{
 	// 244 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2b, 0x2d, 0x4e, 0x2d,
 	0x2a, 0x48, 0x2c, 0x2e, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x4c, 0x4e, 0x2c, 0x49,
-	0xcd, 0x4b, 0x2c, 0x2e, 0x2d, 0x50, 0x32, 0xe2, 0xe2, 0x08, 0x2d, 0x4e, 0x2d, 0x0a, 0x48, 0x2c,
+	0xcd, 0x4b, 0x0c, 0x0e, 0x0d, 0x50, 0x32, 0xe2, 0xe2, 0x08, 0x2d, 0x4e, 0x2d, 0x0a, 0x48, 0x2c,
 	0x2e, 0x16, 0x12, 0xe2, 0x62, 0x01, 0x29, 0x94, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x02, 0xb3,
 	0x41, 0x62, 0x20, 0x8d, 0x12, 0x4c, 0x10, 0x31, 0x10, 0x5b, 0x49, 0x8a, 0x8b, 0x25, 0x14, 0x2a,
 	0x87, 0xae, 0x5e, 0x29, 0x99, 0x8b, 0x2d, 0xb8, 0x24, 0xb1, 0xa4, 0xb4, 0x58, 0xc8, 0x84, 0x8b,
@@ -131,6 +307,6 @@ var fileDescriptor0 = []byte{
 	0x82, 0x18, 0xb6, 0x2b, 0x31, 0x08, 0x99, 0x71, 0x71, 0x39, 0x67, 0x24, 0xe6, 0xa5, 0xa7, 0x82,
 	0x8d, 0x20, 0x5e, 0x9f, 0x25, 0x17, 0xaf, 0x73, 0x46, 0x6a, 0x72, 0x36, 0xdc, 0x76, 0xe2, 0xb5,
 	0x1a, 0x71, 0x71, 0xb9, 0xa4, 0xe6, 0xa4, 0x96, 0xa4, 0x82, 0x9d, 0xca, 0x8f, 0xa6, 0x0f, 0xab,
-	0x9e, 0x24, 0x36, 0x70, 0xac, 0x19, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0xb1, 0x24, 0x54, 0x34,
+	0x9e, 0x24, 0x36, 0x70, 0xac, 0x19, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0x27, 0x34, 0xc0, 0x90,
 	0xc7, 0x01, 0x00, 0x00,
 }

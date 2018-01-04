@@ -4,13 +4,14 @@
 
 syntax = "proto3";
 
-package catenasup;
+package catenaSUP;
 
 service CatenaUserPass {
     rpc AddUser (UserPass) returns (Status) {}
     rpc ChangePass (UserPass) returns (Status) {}
     rpc CheckUserPass (UserPass) returns (Status) {}
     rpc DeleteUser (User) returns (Status) {}
+    //TODO ImportTable
 }
 
 message UserPass {
