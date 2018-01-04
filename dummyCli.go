@@ -12,9 +12,10 @@ import (
 
 func main() {
 	clientSUP.Open()
-	err := clientSUP.AddUser("bob", "love2alice")
+	err, id := clientSUP.AddUser("bob", "love2alice")
 	if err != nil {
 		log.Printf("error adding user: %v", err)
 	}
+	log.Printf("user added with id %d", id)
 	clientSUP.Close()
 }

@@ -7,10 +7,10 @@ syntax = "proto3";
 package catenaSUP;
 
 service CatenaUserPass {
-    rpc AddUser (UserPass) returns (Status) {}
-    rpc ChangePass (UserPass) returns (Status) {}
-    rpc CheckUserPass (UserPass) returns (Status) {}
-    rpc DeleteUser (User) returns (Status) {}
+    rpc AddUser (UserPass) returns (Id) {}
+    rpc ChangePass (UserPass) returns (Empty) {}
+    rpc CheckUserPass (UserPass) returns (Id) {}
+    rpc DeleteUser (User) returns (Empty) {}
     //TODO ImportTable
 }
 
@@ -23,12 +23,9 @@ message User {
     string user = 1;
 }
 
-message Status {
-    enum StatusType {
-        SUCCESS = 0;
-        FAIL = 1;
-        //TODO more precise cases
-    }
+message Empty {
+}
 
-    StatusType result = 1;
+message Id {
+    uint64 id = 1;
 }

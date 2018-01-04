@@ -5,7 +5,6 @@
 package client
 
 import (
-	"errors"
 	"log"
 
 	"golang.org/x/net/context"
@@ -22,7 +21,6 @@ var conn *grpc.ClientConn
 var rpcConn pb.CatenaUserPassClient
 
 func Open() {
-	//TODO package avec init, clean, et wrapper adduser et cie
 	var err error
 	conn, err = grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
@@ -35,15 +33,11 @@ func Close() {
 	conn.Close()
 }
 
-func AddUser(user string, pass string) error {
-	r, err := rpcConn.AddUser(context.Background(), &pb.UserPass{User: user, Pass: pass})
+func AddUser(user string, pass string) (error, uint64) {
+	id, err := rpcConn.AddUser(context.Background(), &pb.UserPass{User: user, Pass: pass})
 	if err != nil {
 		log.Printf("could not add user: %v", err)
-		return err
+		return err, 0
 	}
-	if r.Result != pb.Status_SUCCESS {
-		log.Printf("Failed adding user")
-		return errors.New("Server failed adding user")
-	}
-	return nil
+	return nil, id.Id
 }
