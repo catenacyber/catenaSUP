@@ -24,8 +24,8 @@ type serverSUP struct{}
 
 // adding a user with his password
 func (s *serverSUP) AddUser(ctx context.Context, in *pb.UserPass) (*pb.Status, error) {
-	//TODO
-	return &pb.Status{Result: pb.Status_SUCCESS}, nil
+	err := dbaccess.AddUser(in.User, in.Pass)
+	return &pb.Status{Result: pb.Status_SUCCESS}, err
 }
 
 // changes the password of a user
@@ -47,7 +47,9 @@ func (s *serverSUP) DeleteUser(ctx context.Context, in *pb.User) (*pb.Status, er
 }
 
 func main() {
-	dbaccess.Open()
+	if dbaccess.Open() != nil {
+		log.Fatalf("failed to open database")
+	}
 	defer dbaccess.Close()
 	//TODO port as parameter
 	lis, err := net.Listen("tcp", port)

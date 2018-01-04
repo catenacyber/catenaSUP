@@ -7,19 +7,30 @@ package dbaccess
 import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
-	"log"
 )
 
 var db *sql.DB
 
-func Open() {
+func Open() error {
 	var err error
+	//TODO name as parameter
 	db, err = sql.Open("sqlite3", "./foo.db")
-	if err != nil {
-		log.Fatalf("failed to open database %v", err)
-	}
+	//TODO further checks if db is ok
+	return err
 }
 
 func Close() {
 	db.Close()
+}
+
+func AddUser(user string, pass string) error {
+	stmt, err := db.Prepare("INSERT INTO users VALUES (?, ?, ?)")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(user, pass, "lol")
+	if err != nil {
+		return err
+	}
+	return nil
 }
