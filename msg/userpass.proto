@@ -1,0 +1,33 @@
+// Copyright (c) 2018 Catena cyber
+// Author Philippe Antoine <p.antoine@catenacyber.fr>
+// Describing the messages for catenasup
+
+syntax = "proto3";
+
+package catenasup;
+
+service CatenaUserPass {
+    rpc AddUser (UserPass) returns (Status) {}
+    rpc ChangePass (UserPass) returns (Status) {}
+    rpc CheckUserPass (UserPass) returns (Status) {}
+    rpc DeleteUser (User) returns (Status) {}
+}
+
+message UserPass {
+    string user = 1;
+    string pass = 2;
+}
+
+message User {
+    string user = 1;
+}
+
+message Status {
+    enum StatusType {
+        SUCCESS = 0;
+        FAIL = 1;
+        //TODO more precise cases
+    }
+
+    StatusType result = 1;
+}
