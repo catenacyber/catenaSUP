@@ -2,9 +2,10 @@
 // Author Philippe Antoine <p.antoine@catenacyber.fr>
 // Go client for catenaSUP
 
-package main
+package client
 
 import (
+	"errors"
 	"log"
 
 	"golang.org/x/net/context"
@@ -17,17 +18,32 @@ const (
 	address = "localhost:5455"
 )
 
-func main() {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+var conn *grpc.ClientConn
+var rpcConn pb.CatenaUserPassClient
+
+func Open() {
+	//TODO package avec init, clean, et wrapper adduser et cie
+	var err error
+	conn, err = grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
 	}
-	defer conn.Close()
-	c := pb.NewCatenaUserPassClient(conn)
+	rpcConn = pb.NewCatenaUserPassClient(conn)
+}
 
-	r, err := c.AddUser(context.Background(), &pb.UserPass{User: "bob", Pass: "lovealice"})
+func Close() {
+	conn.Close()
+}
+
+func AddUser(user string, pass string) error {
+	r, err := rpcConn.AddUser(context.Background(), &pb.UserPass{User: user, Pass: pass})
 	if err != nil {
-		log.Fatalf("could not add user: %v", err)
+		log.Printf("could not add user: %v", err)
+		return err
 	}
-	log.Printf("Result: %d", r.Result)
+	if r.Result != pb.Status_SUCCESS {
+		log.Printf("Failed adding user")
+		return errors.New("Server failed adding user")
+	}
+	return nil
 }
