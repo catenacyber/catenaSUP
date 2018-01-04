@@ -11,6 +11,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	"catena/csup/dbaccess"
 	pb "catena/csup/msg"
 )
 
@@ -46,6 +47,8 @@ func (s *serverSUP) DeleteUser(ctx context.Context, in *pb.User) (*pb.Status, er
 }
 
 func main() {
+	dbaccess.Open()
+	defer dbaccess.Close()
 	//TODO port as parameter
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
