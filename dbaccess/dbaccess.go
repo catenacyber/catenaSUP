@@ -5,11 +5,16 @@
 package dbaccess
 
 import (
+	"crypto/rand"
+	"crypto/sha512"
+
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 var db *sql.DB
+
+const SALT_SIZE = 32
 
 func Open() error {
 	var err error
@@ -28,7 +33,13 @@ func AddUser(user string, pass string) error {
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(user, pass, "lol")
+	salt := make([]byte, SALT_SIZE)
+	_, err = rand.Read(salt)
+	if err != nil {
+		return err
+	}
+	hashpass := sha512.Sum512(append(salt, pass...))
+	_, err = stmt.Exec(user, hashpass[:], salt)
 	if err != nil {
 		return err
 	}
