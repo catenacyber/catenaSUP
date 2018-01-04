@@ -24,25 +24,25 @@ type serverSUP struct{}
 // adding a user with his password
 func (s *serverSUP) AddUser(ctx context.Context, in *pb.UserPass) (*pb.Status, error) {
 	//TODO
-	return &pb.Status{Result: *pb.Status_SUCCESS}, nil
+	return &pb.Status{Result: pb.Status_SUCCESS}, nil
 }
 
 // changes the password of a user
 func (s *serverSUP) ChangePass(ctx context.Context, in *pb.UserPass) (*pb.Status, error) {
 	//TODO
-	return &pb.Status{Result: *pb.Status_SUCCESS}, nil
+	return &pb.Status{Result: pb.Status_SUCCESS}, nil
 }
 
 // Checks if a user password pair is valid
 func (s *serverSUP) CheckUserPass(ctx context.Context, in *pb.UserPass) (*pb.Status, error) {
 	//TODO
-	return &pb.Status{Result: *pb.Status_SUCCESS}, nil
+	return &pb.Status{Result: pb.Status_SUCCESS}, nil
 }
 
 // deletes a user
 func (s *serverSUP) DeleteUser(ctx context.Context, in *pb.User) (*pb.Status, error) {
 	//TODO
-	return &pb.Status{Result: *pb.Status_SUCCESS}, nil
+	return &pb.Status{Result: pb.Status_SUCCESS}, nil
 }
 
 func main() {
