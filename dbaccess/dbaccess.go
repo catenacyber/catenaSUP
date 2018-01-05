@@ -21,7 +21,6 @@ const SALT_SIZE = 32
 
 func Open(dbfile string) error {
 	var err error
-	//TODO name as parameter
 	db, err = sql.Open("sqlite3", dbfile)
 	//TODO further checks if db is ok (has users table)
 	return err

@@ -16,9 +16,9 @@ import (
 var conn *grpc.ClientConn
 var rpcConn pb.CatenaUserPassClient
 
-func Open(address string) {
+func Open(address string, tlsOptions []grpc.DialOption) {
 	var err error
-	conn, err = grpc.Dial(address, grpc.WithInsecure())
+	conn, err = grpc.Dial(address, tlsOptions...)
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
 	}

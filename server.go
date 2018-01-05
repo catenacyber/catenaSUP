@@ -10,17 +10,23 @@ import (
 	"log"
 	"net"
 
+	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
+
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	"catena/csup/dbaccess"
 	pb "catena/csup/msg"
 )
 
 var (
-	tls      = flag.Bool("tls", false, "Connection uses TLS if true")
-	certFile = flag.String("cert_file", "", "The TLS certificate file")
-	keyFile  = flag.String("key_file", "", "The TLS key file")
+	tlsOn    = flag.Bool("tls", false, "Connection uses TLS if true")
+	cliCert  = flag.String("cli_cert", "./client.crt", "The TLS certificate file for client")
+	servCert = flag.String("serv_cert", "./serv.crt", "The TLS certificate file for server")
+	servKey  = flag.String("serv_key", "./serv.key", "The TLS key file of server")
 	port     = flag.Int("port", 1541, "The server port")
 	dbfile   = flag.String("dbfile", "./csup.db", "The database file")
 )
@@ -62,8 +68,22 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
-	//TODO use SSL
+	var tlsOptions []grpc.ServerOption
+	if *tlsOn {
+		cert, err := tls.LoadX509KeyPair(*servCert, *servKey)
+		if err != nil {
+			log.Fatalf("failed to certificate and key: %v", err)
+		}
+		clientCert, err := ioutil.ReadFile(*cliCert)
+		if err != nil {
+			log.Fatalf("Unable to open client cert", err)
+		}
+		clientCertPool1 := x509.NewCertPool()
+		clientCertPool1.AppendCertsFromPEM(clientCert)
+		tlsConf := &tls.Config{Certificates: []tls.Certificate{cert}, ClientAuth: tls.RequireAndVerifyClientCert, ClientCAs: clientCertPool1}
+		tlsOptions = []grpc.ServerOption{grpc.Creds(credentials.NewTLS(tlsConf))}
+	}
+	s := grpc.NewServer(tlsOptions...)
 	pb.RegisterCatenaUserPassServer(s, &serverSUP{})
 	if err = s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
