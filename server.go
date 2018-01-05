@@ -23,7 +23,7 @@ import (
 )
 
 var (
-	tlsOn    = flag.Bool("tls", false, "Connection uses TLS if true")
+	tlsOn    = flag.Bool("tls", true, "Connection uses TLS if true")
 	cliCert  = flag.String("cli_cert", "./client.crt", "The TLS certificate file for client")
 	servCert = flag.String("serv_cert", "./serv.crt", "The TLS certificate file for server")
 	servKey  = flag.String("serv_key", "./serv.key", "The TLS key file of server")
@@ -60,8 +60,9 @@ func (s *serverSUP) DeleteUser(ctx context.Context, in *pb.User) (*pb.Empty, err
 
 func main() {
 	flag.Parse()
-	if dbaccess.Open(*dbfile) != nil {
-		log.Fatalf("failed to open database")
+	err := dbaccess.Open(*dbfile)
+	if err != nil {
+		log.Fatalf("failed to open database : %v", err)
 	}
 	defer dbaccess.Close()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))

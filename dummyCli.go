@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	tlsOn    = flag.Bool("tls", false, "Connection uses TLS if true")
+	tlsOn    = flag.Bool("tls", true, "Connection uses TLS if true")
 	cliKey   = flag.String("cli_key", "./client.key", "The TLS key file of client")
 	cliCert  = flag.String("cli_cert", "./client.crt", "The TLS certificate file for client")
 	servCert = flag.String("serv_cert", "./serv.crt", "The TLS certificate file for server")

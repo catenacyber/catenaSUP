@@ -7,6 +7,7 @@ package dbaccess
 import (
 	"bytes"
 	"errors"
+	"strings"
 
 	"crypto/rand"
 	"crypto/sha512"
@@ -15,19 +16,53 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+type hashFun_t func(data []byte) []byte
+
 var db *sql.DB
+var hashFun hashFun_t
 
 const SALT_SIZE = 32
 
 func Open(dbfile string) error {
 	var err error
 	db, err = sql.Open("sqlite3", dbfile)
-	//TODO further checks if db is ok (has users table)
+	if err != nil {
+		return err
+	}
+	rows, err := db.Query("SELECT version, hashfun FROM meta")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	var version string
+	var hashfun string
+
+	if rows.Next() {
+		err = rows.Scan(&version, &hashfun)
+		if err != nil {
+			return err
+		}
+		if strings.Compare(hashfun, "sha512") == 0 {
+			hashFun = sha512slice
+		} else {
+			return errors.New("hash function unsupported")
+		}
+	} else {
+		return errors.New("no meta table")
+	}
+
+	_, err = db.Query("SELECT user, hashpass, salt FROM users")
+
 	return err
 }
 
 func Close() {
 	db.Close()
+}
+
+func sha512slice(data []byte) []byte {
+	hasharray := sha512.Sum512(data)
+	return hasharray[:]
 }
 
 func AddUser(user string, pass string) (error, uint64) {
@@ -40,9 +75,7 @@ func AddUser(user string, pass string) (error, uint64) {
 	if err != nil {
 		return err, 0
 	}
-	//TODO sha512 as db parameter
-	hashpass := sha512.Sum512(append(salt, pass...))
-	res, err := stmt.Exec(user, hashpass[:], salt)
+	res, err := stmt.Exec(user, hashFun(append(salt, pass...)), salt)
 	if err != nil {
 		return err, 0
 	}
@@ -60,8 +93,7 @@ func ChangePass(user string, pass string) error {
 	if err != nil {
 		return err
 	}
-	hashpass := sha512.Sum512(append(salt, pass...))
-	_, err = stmt.Exec(hashpass[:], salt, user)
+	_, err = stmt.Exec(hashFun(append(salt, pass...)), salt, user)
 	return err
 }
 
@@ -77,8 +109,7 @@ func CheckUserPass(user string, pass string) (error, uint64) {
 	if err != nil {
 		return err, 0
 	}
-	hashpass1 := sha512.Sum512(append(salt, pass...))
-	if bytes.Compare(hashpass1[:], hashpass) != 0 {
+	if bytes.Compare(hashFun(append(salt, pass...)), hashpass) != 0 {
 		err = errors.New("password does not match")
 	}
 	return err, id
