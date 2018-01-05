@@ -17,5 +17,6 @@ func main() {
 		log.Printf("error adding user: %v", err)
 	}
 	log.Printf("user added with id %d", id)
+	err = clientSUP.ChangePass("bob", "love2oscar")
 	clientSUP.Close()
 }

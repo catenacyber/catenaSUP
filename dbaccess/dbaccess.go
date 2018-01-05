@@ -47,3 +47,18 @@ func AddUser(user string, pass string) (error, uint64) {
 	id, err := res.LastInsertId()
 	return err, uint64(id)
 }
+
+func ChangePass(user string, pass string) error {
+	salt := make([]byte, SALT_SIZE)
+	_, err := rand.Read(salt)
+	if err != nil {
+		return err
+	}
+	stmt, err := db.Prepare("UPDATE users SET hashpass = ?, salt = ? WHERE user = ?")
+	if err != nil {
+		return err
+	}
+	hashpass := sha512.Sum512(append(salt, pass...))
+	_, err = stmt.Exec(hashpass[:], salt, user)
+	return err
+}

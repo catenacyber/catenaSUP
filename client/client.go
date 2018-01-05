@@ -41,3 +41,8 @@ func AddUser(user string, pass string) (error, uint64) {
 	}
 	return nil, id.Id
 }
+
+func ChangePass(user string, pass string) error {
+	_, err := rpcConn.ChangePass(context.Background(), &pb.UserPass{User: user, Pass: pass})
+	return err
+}
