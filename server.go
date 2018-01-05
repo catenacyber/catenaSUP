@@ -30,20 +30,20 @@ func (s *serverSUP) AddUser(ctx context.Context, in *pb.UserPass) (*pb.Id, error
 
 // changes the password of a user
 func (s *serverSUP) ChangePass(ctx context.Context, in *pb.UserPass) (*pb.Empty, error) {
-	//TODO
-	return &pb.Empty{}, nil
+	err := dbaccess.ChangePass(in.User, in.Pass)
+	return &pb.Empty{}, err
 }
 
 // Checks if a user password pair is valid
 func (s *serverSUP) CheckUserPass(ctx context.Context, in *pb.UserPass) (*pb.Id, error) {
-	//TODO
-	return &pb.Id{Id: 0}, nil
+	err, id := dbaccess.CheckUserPass(in.User, in.Pass)
+	return &pb.Id{Id: id}, err
 }
 
 // deletes a user
 func (s *serverSUP) DeleteUser(ctx context.Context, in *pb.User) (*pb.Empty, error) {
-	//TODO
-	return &pb.Empty{}, nil
+	err := dbaccess.DeleteUser(in.User)
+	return &pb.Empty{}, err
 }
 
 func main() {

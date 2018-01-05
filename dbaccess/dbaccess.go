@@ -5,6 +5,9 @@
 package dbaccess
 
 import (
+	"bytes"
+	"errors"
+
 	"crypto/rand"
 	"crypto/sha512"
 
@@ -60,5 +63,33 @@ func ChangePass(user string, pass string) error {
 	}
 	hashpass := sha512.Sum512(append(salt, pass...))
 	_, err = stmt.Exec(hashpass[:], salt, user)
+	return err
+}
+
+func CheckUserPass(user string, pass string) (error, uint64) {
+	stmt, err := db.Prepare("SELECT rowid, hashpass, salt FROM users WHERE user = ?")
+	if err != nil {
+		return err, 0
+	}
+	var hashpass []byte
+	var salt []byte
+	var id uint64
+	err = stmt.QueryRow(user).Scan(&id, &hashpass, &salt)
+	if err != nil {
+		return err, 0
+	}
+	hashpass1 := sha512.Sum512(append(salt, pass...))
+	if bytes.Compare(hashpass1[:], hashpass) != 0 {
+		err = errors.New("password does not match")
+	}
+	return err, id
+}
+
+func DeleteUser(user string) error {
+	stmt, err := db.Prepare("DELETE FROM users WHERE user = ?")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(user)
 	return err
 }

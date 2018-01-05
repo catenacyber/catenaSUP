@@ -46,3 +46,16 @@ func ChangePass(user string, pass string) error {
 	_, err := rpcConn.ChangePass(context.Background(), &pb.UserPass{User: user, Pass: pass})
 	return err
 }
+
+func CheckUserPass(user string, pass string) (error, uint64) {
+	id, err := rpcConn.CheckUserPass(context.Background(), &pb.UserPass{User: user, Pass: pass})
+	if err != nil {
+		return err, 0
+	}
+	return nil, id.Id
+}
+
+func DeleteUser(user string) error {
+	_, err := rpcConn.DeleteUser(context.Background(), &pb.User{User: user})
+	return err
+}
