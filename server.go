@@ -22,6 +22,7 @@ var (
 	certFile = flag.String("cert_file", "", "The TLS certificate file")
 	keyFile  = flag.String("key_file", "", "The TLS key file")
 	port     = flag.Int("port", 1541, "The server port")
+	dbfile   = flag.String("dbfile", "./csup.db", "The database file")
 )
 
 // serverSUP implements generated CatenaUserPass
@@ -52,11 +53,11 @@ func (s *serverSUP) DeleteUser(ctx context.Context, in *pb.User) (*pb.Empty, err
 }
 
 func main() {
-	if dbaccess.Open() != nil {
+	flag.Parse()
+	if dbaccess.Open(*dbfile) != nil {
 		log.Fatalf("failed to open database")
 	}
 	defer dbaccess.Close()
-	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
