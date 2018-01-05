@@ -5,6 +5,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net"
 
@@ -15,8 +17,11 @@ import (
 	pb "catena/csup/msg"
 )
 
-const (
-	port = ":5455"
+var (
+	tls      = flag.Bool("tls", false, "Connection uses TLS if true")
+	certFile = flag.String("cert_file", "", "The TLS certificate file")
+	keyFile  = flag.String("key_file", "", "The TLS key file")
+	port     = flag.Int("port", 1541, "The server port")
 )
 
 // serverSUP implements generated CatenaUserPass
@@ -51,8 +56,8 @@ func main() {
 		log.Fatalf("failed to open database")
 	}
 	defer dbaccess.Close()
-	//TODO port as parameter
-	lis, err := net.Listen("tcp", port)
+	flag.Parse()
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

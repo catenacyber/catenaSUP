@@ -13,14 +13,10 @@ import (
 	pb "catena/csup/msg"
 )
 
-const (
-	address = "localhost:5455"
-)
-
 var conn *grpc.ClientConn
 var rpcConn pb.CatenaUserPassClient
 
-func Open() {
+func Open(address string) {
 	var err error
 	conn, err = grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {

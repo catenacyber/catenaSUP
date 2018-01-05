@@ -5,13 +5,19 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	clientSUP "catena/csup/client"
 )
 
+var (
+	server = flag.String("server", "localhost:1541", "Server address")
+)
+
 func main() {
-	clientSUP.Open()
+	flag.Parse()
+	clientSUP.Open(*server)
 	err, id := clientSUP.AddUser("bob", "love2alice")
 	if err != nil {
 		log.Fatalf("error adding user: %v", err)
