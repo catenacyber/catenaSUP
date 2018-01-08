@@ -37,19 +37,19 @@ type serverSUP struct{}
 // rpc calls : computation done by dbaccess package
 // adding a user with his password
 func (s *serverSUP) AddUser(ctx context.Context, in *pb.UserPass) (*pb.Id, error) {
-	err, id := dbaccess.AddUser(in.User, in.Pass)
+	err, id := dbaccess.AddUser(in.User, in.Password)
 	return &pb.Id{Id: id}, err
 }
 
 // changes the password of a user
 func (s *serverSUP) ChangePass(ctx context.Context, in *pb.UserPass) (*pb.Empty, error) {
-	err := dbaccess.ChangePass(in.User, in.Pass)
+	err := dbaccess.ChangePass(in.User, in.Password)
 	return &pb.Empty{}, err
 }
 
 // Checks if a user password pair is valid
 func (s *serverSUP) CheckUserPass(ctx context.Context, in *pb.UserPass) (*pb.Id, error) {
-	err, id := dbaccess.CheckUserPass(in.User, in.Pass)
+	err, id := dbaccess.CheckUserPass(in.User, in.Password)
 	return &pb.Id{Id: id}, err
 }
 

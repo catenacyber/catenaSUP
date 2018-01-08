@@ -16,7 +16,7 @@ service CatenaUserPass {
 
 message UserPass {
     string user = 1;
-    string pass = 2;
+    string password = 2;
 }
 
 message User {

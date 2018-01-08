@@ -31,7 +31,7 @@ func Close() {
 
 //RPC stubs
 func AddUser(user string, pass string) (error, uint64) {
-	id, err := rpcConn.AddUser(context.Background(), &pb.UserPass{User: user, Pass: pass})
+	id, err := rpcConn.AddUser(context.Background(), &pb.UserPass{User: user, Password: pass})
 	if err != nil {
 		return err, 0
 	}
@@ -39,12 +39,12 @@ func AddUser(user string, pass string) (error, uint64) {
 }
 
 func ChangePass(user string, pass string) error {
-	_, err := rpcConn.ChangePass(context.Background(), &pb.UserPass{User: user, Pass: pass})
+	_, err := rpcConn.ChangePass(context.Background(), &pb.UserPass{User: user, Password: pass})
 	return err
 }
 
 func CheckUserPass(user string, pass string) (error, uint64) {
-	id, err := rpcConn.CheckUserPass(context.Background(), &pb.UserPass{User: user, Pass: pass})
+	id, err := rpcConn.CheckUserPass(context.Background(), &pb.UserPass{User: user, Password: pass})
 	if err != nil {
 		return err, 0
 	}
