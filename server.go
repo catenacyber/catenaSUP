@@ -31,9 +31,10 @@ var (
 	dbfile   = flag.String("dbfile", "./csup.db", "The database file")
 )
 
-// serverSUP implements generated CatenaUserPass
+// serverSUP implements generated CatenaUserPass rpc
 type serverSUP struct{}
 
+// rpc calls : computation done by dbaccess package
 // adding a user with his password
 func (s *serverSUP) AddUser(ctx context.Context, in *pb.UserPass) (*pb.Id, error) {
 	err, id := dbaccess.AddUser(in.User, in.Pass)
@@ -60,15 +61,19 @@ func (s *serverSUP) DeleteUser(ctx context.Context, in *pb.User) (*pb.Empty, err
 
 func main() {
 	flag.Parse()
+
 	err := dbaccess.Open(*dbfile)
 	if err != nil {
 		log.Fatalf("failed to open database : %v", err)
 	}
 	defer dbaccess.Close()
+
+	//server and connection will be closed on signal
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
 	var tlsOptions []grpc.ServerOption
 	if *tlsOn {
 		cert, err := tls.LoadX509KeyPair(*servCert, *servKey)
@@ -84,6 +89,7 @@ func main() {
 		tlsConf := &tls.Config{Certificates: []tls.Certificate{cert}, ClientAuth: tls.RequireAndVerifyClientCert, ClientCAs: clientCertPool1}
 		tlsOptions = []grpc.ServerOption{grpc.Creds(credentials.NewTLS(tlsConf))}
 	}
+
 	s := grpc.NewServer(tlsOptions...)
 	pb.RegisterCatenaUserPassServer(s, &serverSUP{})
 	if err = s.Serve(lis); err != nil {

@@ -1,11 +1,12 @@
 // Copyright (c) 2018 Catena cyber
 // Author Philippe Antoine <p.antoine@catenacyber.fr>
-// Go client for catenaSUP
+// Go client example for catenaSUP
 
 package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"crypto/tls"
@@ -28,7 +29,10 @@ var (
 )
 
 func main() {
+	//parse options
 	flag.Parse()
+
+	//prepares tls connection
 	var tlsOptions []grpc.DialOption
 	if *tlsOn {
 		cert, err := tls.LoadX509KeyPair(*cliCert, *cliKey)
@@ -54,12 +58,21 @@ func main() {
 	} else {
 		tlsOptions = append(tlsOptions, grpc.WithInsecure())
 	}
-	clientSUP.Open(*server, tlsOptions)
+
+	//open connection
+	err := clientSUP.Open(*server, tlsOptions)
+	if err != nil {
+		log.Fatalf("failed to open connection: %v", err)
+	}
+	defer clientSUP.Close()
+
+	//some dummy operations for testing :
+	//add user, change his password, adds another user, checks user-pass and deletes user
 	err, id := clientSUP.AddUser("bob", "love2alice")
 	if err != nil {
 		log.Fatalf("error adding user: %v", err)
 	}
-	log.Printf("user added with id %d", id)
+	fmt.Printf("user added with id %d\n", id)
 	err = clientSUP.ChangePass("bob", "love2oscar")
 	if err != nil {
 		log.Fatalf("error changing password: %v", err)
@@ -69,25 +82,25 @@ func main() {
 	if err != nil {
 		log.Fatalf("error adding user: %v", err)
 	}
-	log.Printf("user added with id %d", id)
+	fmt.Printf("user added with id %d\n", id)
 
 	err, id = clientSUP.CheckUserPass("bob", "love2alice")
 	if err != nil {
-		log.Printf("access denied for user password: %v", err)
+		fmt.Printf("access denied for user password: %v\n", err)
 	} else {
-		log.Printf("access granted with old password")
+		fmt.Printf("access granted with old password\n")
 	}
 	err, id = clientSUP.CheckUserPass("bob", "secondtry")
 	if err != nil {
-		log.Printf("access denied for user password: %v", err)
+		fmt.Printf("access denied for user password: %v\n", err)
 	} else {
-		log.Printf("access granted with wrong password")
+		fmt.Printf("access granted with wrong password\n")
 	}
 	err, id = clientSUP.CheckUserPass("bob", "love2oscar")
 	if err != nil {
-		log.Printf("access denied with good password: %v", err)
+		fmt.Printf("access denied with good password: %v\n", err)
 	} else {
-		log.Printf("access granted with ok password")
+		fmt.Printf("access granted with ok password\n")
 	}
 
 	err = clientSUP.DeleteUser("bob")
@@ -96,9 +109,8 @@ func main() {
 	}
 	err, id = clientSUP.CheckUserPass("bob", "love2oscar")
 	if err != nil {
-		log.Printf("access denied for user password: %v", err)
+		fmt.Printf("access denied for user password: %v\n", err)
 	} else {
-		log.Printf("access granted with deleted user")
+		fmt.Printf("access granted with deleted user\n")
 	}
-	clientSUP.Close()
 }
