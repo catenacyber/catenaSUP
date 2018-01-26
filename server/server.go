@@ -18,8 +18,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	"github.com/catena/CatenaSUP/dbaccess"
-	pb "github.com/catena/CatenaSUP/msg"
+	"github.com/catenacyber/CatenaSUP/dbaccess"
+	pb "github.com/catenacyber/CatenaSUP/msg"
 )
 
 var (
