@@ -33,6 +33,17 @@ All the client has to do is :
 - call when needed the RPC procedures AddUser, ChangePass, CheckUserPass, DeleteUser
 - close the connection
 
+## License
+
+GPLv3
+
+This software uses :
+- grpc (Apache License 2.0)
+- protobuf (MIT-like license)
+- sqlite3 (public domain)
+- memguard (Apache License 2.0)
+- argon2 (MIT License)
+
 ## TODO
 
 - Automate testing
