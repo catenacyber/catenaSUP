@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	pb "catena/csup/msg"
+	pb "github.com/catena/CatenaSUP/msg"
 )
 
 //global variable : connection objects
