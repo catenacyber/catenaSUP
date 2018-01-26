@@ -17,7 +17,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	clientSUP "github.com/catenacyber/CatenaSUP/client"
+	clientSUP "github.com/catenacyber/catenaSUP/client"
 )
 
 var (
