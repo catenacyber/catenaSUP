@@ -11,13 +11,14 @@ import (
 
 	"crypto/rand"
 	"crypto/sha512"
+	"github.com/lhecker/argon2"
 
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 //type definition of the hashing function
-type hashFun_t func(data []byte) []byte
+type hashFun_t func(data []byte, salt []byte) (error, []byte)
 
 //global variable : database object connection
 var db *sql.DB
@@ -49,7 +50,9 @@ func Open(dbfile string) error {
 		if err != nil {
 			return err
 		}
-		if strings.Compare(hashfun, "sha512") == 0 {
+		if strings.Compare(hashfun, "argon2") == 0 {
+			hashFun = argon2slice
+		} else if strings.Compare(hashfun, "sha512") == 0 {
 			hashFun = sha512slice
 		} else {
 			return errors.New("hash function unsupported")
@@ -68,10 +71,19 @@ func Close() {
 	db.Close()
 }
 
-func sha512slice(data []byte) []byte {
+func sha512slice(data []byte, salt []byte) (error, []byte) {
 	//sha512 function with slices and not array as output
-	hasharray := sha512.Sum512(data)
-	return hasharray[:]
+	hasharray := sha512.Sum512(append(salt, data...))
+	return nil, hasharray[:]
+}
+
+func argon2slice(data []byte, salt []byte) (error, []byte) {
+	//sha512 function with slices and not array as output
+	//TODO
+	cfg := argon2.DefaultConfig()
+	cfg.SaltLength = uint32(len(salt))
+	raw, err := cfg.Hash(data, salt)
+	return err, raw.Hash
 }
 
 //top level db access functions
@@ -85,7 +97,12 @@ func AddUser(user string, pass string) (error, uint64) {
 	if err != nil {
 		return err, 0
 	}
-	res, err := stmt.Exec(user, hashFun(append(salt, pass...)), salt)
+	err, hashed := hashFun([]byte(pass), salt)
+	if err != nil {
+		return err, 0
+	}
+memzerostr(&pass)
+	res, err := stmt.Exec(user, hashed, salt)
 	if err != nil {
 		return err, 0
 	}
@@ -103,7 +120,11 @@ func ChangePass(user string, pass string) error {
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(hashFun(append(salt, pass...)), salt, user)
+	err, hashed := hashFun([]byte(pass), salt)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(hashed, salt, user)
 	return err
 }
 
@@ -120,7 +141,11 @@ func CheckUserPass(user string, pass string) (error, uint64) {
 		return err, 0
 	}
 	//could check hashpass length for upgrading hash function
-	if bytes.Compare(hashFun(append(salt, pass...)), hashpass) != 0 {
+	err, hashed := hashFun([]byte(pass), salt)
+	if err != nil {
+		return err, 0
+	}
+	if bytes.Compare(hashed, hashpass) != 0 {
 		err = errors.New("password does not match")
 	}
 	return err, id

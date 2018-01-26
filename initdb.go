@@ -41,7 +41,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to execute create request %v", err)
 	}
-	stmt, err = db.Prepare("INSERT INTO meta VALUES ('v1', 'sha512')")
+	stmt, err = db.Prepare("INSERT INTO meta VALUES ('v1', 'argon2')")
 	if err != nil {
 		log.Fatalf("failed to prepare insert request %v", err)
 	}
