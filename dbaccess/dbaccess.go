@@ -11,6 +11,7 @@ import (
 
 	"crypto/rand"
 	"crypto/sha512"
+	"github.com/awnumar/memguard"
 	"github.com/lhecker/argon2"
 
 	"database/sql"
@@ -73,16 +74,25 @@ func Close() {
 
 func sha512slice(data []byte, salt []byte) (error, []byte) {
 	//sha512 function with slices and not array as output
-	hasharray := sha512.Sum512(append(salt, data...))
+	b, err := memguard.NewImmutableFromBytes(data)
+	if err != nil {
+		return err, nil
+	}
+	hasharray := sha512.Sum512(append(salt, b.Buffer()...))
+	b.Destroy()
 	return nil, hasharray[:]
 }
 
 func argon2slice(data []byte, salt []byte) (error, []byte) {
 	//sha512 function with slices and not array as output
-	//TODO
+	b, err := memguard.NewImmutableFromBytes(data)
+	if err != nil {
+		return err, nil
+	}
 	cfg := argon2.DefaultConfig()
 	cfg.SaltLength = uint32(len(salt))
-	raw, err := cfg.Hash(data, salt)
+	raw, err := cfg.Hash(b.Buffer(), salt)
+	b.Destroy()
 	return err, raw.Hash
 }
 
@@ -101,7 +111,6 @@ func AddUser(user string, pass string) (error, uint64) {
 	if err != nil {
 		return err, 0
 	}
-memzerostr(&pass)
 	res, err := stmt.Exec(user, hashed, salt)
 	if err != nil {
 		return err, 0
